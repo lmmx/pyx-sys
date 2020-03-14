@@ -1,5 +1,6 @@
 from ff_tab import TabSet
 
+
 class Window(object):
     """
     A class representing an individual entry in the 'windows' list of a Firefox session
@@ -17,6 +18,9 @@ class Window(object):
             json["width"], json["height"], json["screenX"], json["screenY"]
         )
         return
+
+    def __repr__(self):
+        return f"{self.tabs}; {self.geom}\nSelected: {self.selected_tab}"
 
     @property
     def tabs(self):
@@ -52,7 +56,7 @@ class WindowGeom(object):
         return
 
     def __repr__(self):
-        return f"WindowGeom: {self.width} x {self.height} at ({self.x}, {self.y})"
+        return f"{self.width} x {self.height} at ({self.x}, {self.y})"
 
     @property
     def width(self):

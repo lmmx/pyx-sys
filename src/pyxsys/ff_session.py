@@ -22,20 +22,17 @@ class BrowserSession(object):
         return self._start_time
 
 
-class WindowSet(object):
+class WindowSet(list):
     """
     A class which reads the 'windows' of a Firefox recovery JSON file, and
     instantiates a set of Window classes for each of the listed entries.
     """
 
     def __init__(self, json_list):
-        self._window_list = [Window(j) for j in json_list]
+        self.extend([Window(j) for j in json_list])
         return
 
     def __repr__(self):
-        n_win = len(self.window_list)
-        return f"WindowSet of {n_win} windows"
-
-    @property
-    def window_list(self):
-        return self._window_list
+        n_win = len(self)
+        window_reprs = '\n\n'.join([str(w) for w in self])
+        return f"WindowSet of {n_win} windows\n\n{window_reprs}"

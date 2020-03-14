@@ -1,14 +1,17 @@
 from datetime import datetime as dt
 
 
-class TabSet(object):
+class TabSet(list):
     """
     A class representing a list of tabs inside a window.
     """
 
     def __init__(self, json_list):
-        self._tab_list = [Tab(j) for j in json_list]
+        self.extend([Tab(j) for j in json_list])
         return
+
+    def __repr__(self):
+        return "\n".join([f"{i} ⠶ {x}" for i, x in enumerate(self)])
 
 
 class Tab(object):
@@ -20,7 +23,7 @@ class Tab(object):
         return
 
     def __repr__(self):
-        return f"{self.index + 1}/{len(self.history.states)}, at {self.current_state}"
+        return f"{self.current_state} ({self.index + 1}/{len(self.history)})"
 
     @property
     def history(self):
@@ -36,25 +39,21 @@ class Tab(object):
 
     @property
     def current_state(self):
-        return self.history.states[self.index]
+        return self.history[self.index]
 
     @property
     def icon(self):
         return self._icon
 
 
-class TabHistoryChain(object):
+class TabHistoryChain(list):
     """
     Stores the history of a given tab as a list of TabState objects (chronological).
     """
 
     def __init__(self, json_list):
-        self._states = [TabState(j) for j in json_list]
+        self.extend([TabState(j) for j in json_list])
         return
-
-    @property
-    def states(self):
-        return self._states
 
 
 class TabState(object):

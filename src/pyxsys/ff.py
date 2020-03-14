@@ -1,6 +1,7 @@
 from pathlib import Path
 from configparser import ConfigParser
 from lz4 import read_jsonlz4
+from ff_session import BrowserSession
 
 
 def find_recovery_json():
@@ -75,3 +76,13 @@ def read_recovery_json(jsonlz4_path=None):
         jsonlz4_path = find_recovery_json()
     json = read_jsonlz4(jsonlz4_path)
     return json
+
+
+def read_session(session_file=None, report=True):
+    """
+    Decompress the session storage backup of either the default browser profile,
+    or one specified by the session_file parameter (filetype must be JSONLZ4).
+    """
+    session_json = read_recovery_json(session_file)
+    session = BrowserSession(session_json)
+    return session
