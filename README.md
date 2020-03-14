@@ -7,6 +7,13 @@ A library for storage and restore of system state in terms of windows and worksp
 > In a similar vein, this library aims to be an elaborate cabinet for process-centric storage of all the components that make up a
 > developer's workflow, to assist in the shutting down of a system in use and restoring its workflow to the same state it was in before.
 
+## Requirements
+
+- dejsonlz4 (GitHub: [avih/dejsonlz4](https://github.com/avih/dejsonlz4))
+  - Used to decompress recovery JSON of Firefox browser state (windows, tabs, recent history)
+- Linux
+  - For use with Mac/Windows, I'd need to see their Firefox `sessionstore-backups` location
+
 ## Capabilities
 
 - List and store `wmctrl`/`xwininfo` representations of X window state across workspaces
@@ -22,3 +29,7 @@ A library for storage and restore of system state in terms of windows and worksp
     recorded together.
   - Partly this is for session restore, however it may also be used for 'reference restore', i.e. restore at a later date,
     (for instance when returning to work on a particular feature and opening both the code files and the docs together).
+
+## Read more
+
+- Wiki ⠶ [Firefox profiles](wiki/Firefox_profiles.md)
