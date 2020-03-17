@@ -1,6 +1,7 @@
 from subprocess import run
 from shutil import which
-from x_session import WindowTree, RootWindow, TreePath
+from x_tree import WindowTree, TreePath
+from x_window import Window, RootWindow, SourceWindow, ParentWindow
 
 
 def read_xwin_tree():

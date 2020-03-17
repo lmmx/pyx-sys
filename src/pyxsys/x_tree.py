@@ -1,5 +1,3 @@
-from x_window import Window, RootWindow, SourceWindow, ParentWindow
-
 class WindowTree(object):
     def __init__(self):
         """
