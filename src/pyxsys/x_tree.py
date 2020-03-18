@@ -1,3 +1,5 @@
+from x_window import ChildWindow, RootWindow, SourceWindow
+
 class WindowTree(object):
     def __init__(self):
         """
@@ -20,7 +22,7 @@ class WindowTree(object):
         self._root_initialised = False
         self._root_indent_offset = None
         self._open_path = None
-        self._deepest_opened_level = None
+        self._deepest_open_level = None
         self._indent_step_size = 3
         return
 
@@ -54,6 +56,8 @@ class WindowTree(object):
 
     def initialise_source(self, source_line):
         self.source = SourceWindow(source_line)
+        assert self.open_path is None, "Expected no open path on uninitialised tree"
+        self.open_path = TreePath([self.source])
         self._source_initialised = True
         return
 
@@ -63,10 +67,8 @@ class WindowTree(object):
 
     def initialise_root(self, root_line, root_line_indent):
         self.root = RootWindow(root_line)
-        assert self.open_path is None, "Expected no open path on uninitialised tree"
         assert self.root.win_id != "0x0", ValueError("Cannot root a tree at NULL")
-        self.open_path = TreePath([self.root.win_id])
-        tree.root_indent_offset = root_line_indent  # it's 2, but do not hard code this
+        self.root_indent_offset = root_line_indent  # it's 2, but do not hard code this
         self._root_initialised = True
         return
 
@@ -89,8 +91,13 @@ class WindowTree(object):
         return
 
     @property
-    def deepest_opened_level(self):
+    def deepest_open_level(self):
         return self.open_path.deepest_level
+
+    def retract_to_level(self, target_level):
+        level_step = self.deepest_open_level - target_level
+        self.open_path.retract_levels(level_step)
+        return
 
     @property
     def indent_step_size(self):
@@ -104,9 +111,9 @@ class TreePath(list):
     For conciseness, store only the ID of each window on the branch, given as a list.
     """
 
-    def __init__(self, branch_id_list):
-        assert len(branch_id_list) > 0, "Cannot create a TreePath from an empty ID list"
-        self.extend(branch_id_list)
+    def __init__(self, window_list):
+        assert len(window_list) > 0, "Cannot create TreePath from empty window list"
+        self.extend(window_list)
         self._deepest_level = len(self) - 1
         self._deepest_node = self[-1]
         return
@@ -123,17 +130,48 @@ class TreePath(list):
     @property
     def deepest_node(self):
         self._deepest_node = self[-1]
-        return self._deepest_level
+        return self._deepest_node
 
-    def deepen(self, extension_branch):
-        assert len(extension_branch) > 0, "Cannot extend a TreePath with an empty list"
-        self.extend(extension_branch)
+    @property
+    def deepest_parent(self):
+        if self.deepest_level < 1:
+            return None
+        else:
+            self._deepest_parent = self[-2]
+        return self._deepest_parent
+
+    def deepen(self, child_window_line):
+        """
+        Extend the open path on the tree by providing a Window object (TODO: store on
+        the path by its ID only), while its parent (i.e. prior node on the TreePath)
+        window will have the extension window added as a child node.
+        """
+        extension_window = ChildWindow(child_window_line)
+        # assert Window in type(extension_window).mro(), "TreePath.deepen takes a Window"
+        self.deepest_node.add_children([extension_window])
+        self.extend([extension_window])
+        return
+
+    def continue_level(self, sibling_window_line):
+        """
+        Extend the open path on the tree by providing a Window object (TODO: store on
+        the path by its ID only), while its parent (i.e. prior node on the TreePath)
+        window will have the extension window added as a child node. Unlike deepen,
+        this method is used when the level has already been begun (i.e. adding a sibling
+        at the level of a previous child rather than a new level of children).
+        """
+        extension_window = ChildWindow(sibling_window_line)
+        # assert Window in type(extension_window).mro(), "TreePath.deepen takes a Window"
+        assert self.deepest_level > 0, "No parent windows: path has only one window"
+        self.deepest_parent.add_children([extension_window])
+        self.pop()
+        self.extend([extension_window])
         return
 
     def retract_levels(self, n_levels):
-        assert type(n_levels) is int, TypeError("Not an integer number of levels")
+        assert type(n_levels) is int, TypeError(f"{n_levels} not an integer of levels")
         initial_d = self.deepest_level
-        assert n_levels <= initial_d, f"Cannot retract {n_levels}, max. is {initial_d}"
+        assert n_levels < initial_d, f"Cannot retract {n_levels}, max. is {initial_d}"
         for n in range(n_levels):
             self.pop()
         assert initial_d - self.deepest_level == n_levels, f"Did not retract {n_levels}"
