@@ -16,8 +16,8 @@ class WindowTree(object):
         """
         self._source = None
         self._root = None
-        self._initialised = False
-        self._header_initialised = False
+        self._source_initialised = False
+        self._root_initialised = False
         self._root_indent_offset = None
         self._open_path = None
         self._deepest_opened_level = None
@@ -49,19 +49,25 @@ class WindowTree(object):
         return
 
     @property
-    def initialised(self):
-        return self._initialised
+    def source_initialised(self):
+        return self._source_initialised
 
-    def initialise(self):
-        self._initialised = True
+    def initialise_source(self, source_line):
+        self.source = SourceWindow(source_line)
+        self._source_initialised = True
         return
 
     @property
-    def header_initialised(self):
-        return self._initialised
+    def root_initialised(self):
+        return self._root_initialised
 
-    def initialise_header(self):
-        self._header_initialised = True
+    def initialise_root(self, root_line, root_line_indent):
+        self.root = RootWindow(root_line)
+        assert self.open_path is None, "Expected no open path on uninitialised tree"
+        assert self.root.win_id != "0x0", ValueError("Cannot root a tree at NULL")
+        self.open_path = TreePath([self.root.win_id])
+        tree.root_indent_offset = root_line_indent  # it's 2, but do not hard code this
+        self._root_initialised = True
         return
 
     @property
@@ -76,6 +82,11 @@ class WindowTree(object):
     @property
     def open_path(self):
         return self._open_path
+
+    @open_path.setter
+    def open_path(self, path):
+        self._open_path = path
+        return
 
     @property
     def deepest_opened_level(self):

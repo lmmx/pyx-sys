@@ -34,5 +34,5 @@ class WindowSet(list):
 
     def __repr__(self):
         n_win = len(self)
-        window_reprs = '\n\n'.join([str(w) for w in self])
+        window_reprs = "\n\n".join([str(w) for w in self])
         return f"WindowSet of {n_win} windows\n\n{window_reprs}"

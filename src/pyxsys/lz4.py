@@ -3,6 +3,7 @@ from subprocess import run
 from shutil import which
 from json import loads
 
+
 def read_jsonlz4(jsonlz4_path):
     """
     Decompress the jsonlz4 file (over STDIN) using dejsonlz4 (assumed to be on PATH),

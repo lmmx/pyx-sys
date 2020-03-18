@@ -1,7 +1,6 @@
 from subprocess import run
 from shutil import which
-from x_tree import WindowTree, TreePath
-from x_window import Window, RootWindow, SourceWindow, ParentWindow
+from x_tree import WindowTree
 
 
 def read_xwin_tree():
@@ -10,11 +9,9 @@ def read_xwin_tree():
     """
     assert which("xwininfo") is not None, "xwininfo not found, please install it"
     result = run(["xwininfo", "-tree", "-root"], capture_output=True)
-    tree_str = result.stdout
-    err = result.stderr
-    assert result.returncode == 0, f"xwininfo call failed.\n{err}"
-    tree_dict = process_xwin_tree(tree_str)
-    return tree_dict
+    assert result.returncode == 0, f"xwininfo call failed.\n{result.stderr}"
+    tree = process_xwin_tree(result.stdout)
+    return tree
 
 
 def process_xwin_tree(tree_str):
@@ -24,30 +21,24 @@ def process_xwin_tree(tree_str):
     """
     tree_lines = tree_str.split(b"\n")
     tree = WindowTree()
-    subnode_indent_step_size = 3  # Each child node is indented by 3 spaces
     for line in tree_lines:
         line_indent = line.count(b" ") - line.lstrip().count(b" ")
-        if not tree.header_initialised:
+        if not tree.source_initialised:
             if line_indent == 0:
-                if line == b'':
-                    # Skip empty unindented lines at the start of the tree header
+                if line == b"":
+                    # Skip empty unindented lines at the start of the tree source
                     continue
-                # Handle one non-empty unindented line at the start of the tree header
-                tree.source = SourceWindow(line)
+                # Handle one non-empty unindented line at the start of the tree source
                 # Only one opening line, so initialise and skip to indentation
-                tree.initialise_header()
-        elif not tree.initialised:
-            if line == b'':
+                tree.initialise_source(line)
+        elif not tree.root_initialised:
+            if line == b"":
                 # Skip empty unindented lines after the start of the tree input
                 continue
             # Reached the main tree section, can process it according to indentation
-            tree.root = RootWindow(line)
-            tree.root_indent_offset = line_indent # will be 2, but do not hard code this
-            # DEPRECATED: TODO access the open path directly
-            tree.deepest_opened_level = 0
-            tree.initialise()
+            tree.initialise_root(line, line_indent)
             continue
-        elif tree.initialised and line_indent == 0:
+        elif tree.root_initialised and line_indent == 0:
             # Stop processing if you reach a blank or unindented line
             break
         # If/else block finished: the following will run for the indented tree section
@@ -57,8 +48,10 @@ def process_xwin_tree(tree_str):
             # This line will declare how many subnodes will be listed
             if line_level == 1:
                 # Subnode(s) of the source node
+                pass
             else:
                 # Subnode(s) more than one level below a source nodes
+                pass
             # DEPRECATED: TODO access the open path directly
             tree.deepest_opened_level = line_level
         elif line_level < tree.deepest_opened_level:
@@ -69,7 +62,7 @@ def process_xwin_tree(tree_str):
             # This line will be declaring a new entry in the deepest indentation level
             if line_level == 0:
                 # This is the parent of the source window
-                tree.source.parent = ParentWindow(line)
+                tree.source.assign_parent(line)
                 continue
             # TODO
     return tree

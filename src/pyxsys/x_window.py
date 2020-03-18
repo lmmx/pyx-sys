@@ -1,6 +1,7 @@
 class Window(list):
-    def __init__(self, win_id, description, name):
+    def __init__(self, win_id, name):
         self.win_id = win_id
+        self.name = name
         self.children = self
         return
 
@@ -8,7 +9,11 @@ class Window(list):
         """
         An inheritable string representation. Prints the window type and ID.
         """
-        return f"{type(self).__name__}, id: {self.win_id}"
+        if self.name is None:
+            name_repr = "(has no name)"
+        else:
+            name_repr = f'"{name}"'
+        return f"{type(self).__name__}, id: {self.win_id} {name_repr}"
 
     @staticmethod
     def check_id(win_id):
@@ -31,6 +36,15 @@ class Window(list):
         return
 
     @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+        return
+
+    @property
     def children(self):
         return self._children
 
@@ -40,9 +54,9 @@ class Window(list):
         return
 
 
-class DescWindow(Window):
+class WindowDesc(Window):
     def __init__(self, line):
-        super(WindowDesc, self).__init__(self.parse_descline(line))
+        super(WindowDesc, self).__init__(*self.parse_descline(line))
         return
 
     @staticmethod
@@ -68,6 +82,18 @@ class SourceWindow(WindowDesc):
         # Remove xwininfo output prefix before processing line for ID and window name
         super(SourceWindow, self).__init__(line[line.find(":") + 1 :])
         return
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        self._parent = parent
+        return
+
+    def assign_parent(self, parent_line):
+        self.parent = ParentWindow(line)
 
 
 class RootWindow(WindowDesc):
