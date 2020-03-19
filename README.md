@@ -13,12 +13,18 @@ A library for storage and restore of system state in terms of windows and worksp
   - Used to decompress recovery JSON of Firefox browser state (windows, tabs, recent history)
 - Linux
   - For use with Mac/Windows, I'd need to see their Firefox `sessionstore-backups` location
+- X window system (`xwininfo` must be called to retrieve the list of windows)
 
 ## Capabilities
 
-- List and store `wmctrl`/`xwininfo` representations of X window state across workspaces
-- List and store Firefox window/tab list which can be cross-referenced to the X window/workspace list
-- List and store terminal locations and tmux config, possible cross-ref. to X window/workspace list (?)
+- [x] Access the `xwininfo` tree, stored as a `WindowTree` class with a `children` attribute that can be walked
+      to enumerate all windows on the system.
+  - [ ] Modify and activate particular windows in the tree using `wmctrl` given their ID
+  - [ ] Cross-reference to the workspace listing (TODO: find where this is stored)
+- [x] List Firefox window/tab list which can be cross-referenced to the X window/workspace list
+  - [ ] Store the list of windows/tabs
+  - [ ] Cross-reference to the X window/workspace list
+- [ ] List and store terminal locations and tmux config, cross-reference to X window/workspace list
 
 ## Rationale
 
