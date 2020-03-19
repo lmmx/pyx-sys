@@ -1,5 +1,6 @@
 from x_window import ChildWindow, RootWindow, SourceWindow
 
+
 class WindowTree(object):
     def __init__(self):
         """
@@ -100,15 +101,117 @@ class WindowTree(object):
     def indent_step_size(self):
         return self._indent_step_size
 
+    def show_outline(self):
+        """
+        Print the outline view.
+        """
+        print(self.outline)
+        return
+
+    @property
     def outline(self):
         """
-        TODO: Print a simple outline view of the tree from its source.
+        Return a simple outline view of the tree from its source.
         Unlike the __repr__, just show the hierarchy of windows and IDs,
-        as in a file viewer.
+        as in a file viewer. Printable using the function show_outline.
         """
-        outline_view = ""
-        #outline_view += self.source.win_id
-        return outline_view
+        dot_dash_outline = self.dot_dash_outline(self.source)
+        box_outline = self.parse_dot_dash_outline_to_box_outline(dot_dash_outline)
+        return box_outline
+
+    @staticmethod
+    def show_numbered_hierarchy(root, indent="0"):
+        root_name = root.name
+        if root_name is None:
+            root_name = "(unnamed)"
+        print(" ".join([indent, root_name]))
+        for i, c in enumerate(root.children, 0):
+            WindowTree.show_numbered_hierarchy(c, "".join((" ", indent, ".", str(i))))
+        return
+
+    @staticmethod
+    def dot_dash_outline(root, indent=""):
+        """
+        Print a simple representation of the hierarchy path below a root node, by
+        representing the level with dots and the open/closed status of the level
+        by an underscore or a dash (respectively).
+        """
+        outline = []
+        root_name = root.name
+        if root_name is None:
+            root_name = "(unnamed)"
+        outline.append(" ".join([indent, root_name]))
+        for i, child in enumerate(root.children, 0):
+            if i == len(root.children) - 1:
+                joiner = "-"
+            else:
+                joiner = "_"
+            sub_indent = "".join((joiner, indent, ".", str("")))
+            outline.append(WindowTree.dot_dash_outline(child, sub_indent))
+        return "\n".join(outline)
+
+    @staticmethod
+    def parse_dot_dash_outline_to_box_outline(outline_str):
+        """
+        Parse the dot/dash/underscore notation from print_dot_dash_outline.
+        The dash/underscore representation is of the same length as the
+        dot representation (i.e. one dot per level), and the series of
+        dashes and/or underscores indicates the closed/open status from the
+        deepest level up to the uppermost/source level.
+
+        E.g. "-_.." indicates a level 2 node which is closing at level 1 (i.e.
+        it is the last child node of the deepest node) and remaining open at
+        level 0 (i.e. it is not the last child node of the uppermost/source node).
+        """
+        outline = []
+        outline_dict = {
+            "last_child": "┗",
+            "mid_child": "┣",
+            "h_connect": "━",
+            "v_connect": "┃",
+            "empty": " ",
+        }
+        for line in outline_str.split("\n"):
+            parsed_line = ""
+            dot_dash_str = line.split(" ")[0]
+            if dot_dash_str == "":
+                node_level = 0
+                path_status = []
+            else:
+                assert "." in dot_dash_str, ValueError("Input is not valid")
+                node_level = dot_dash_str.count(".")
+                # Extract the dash/underscore path representation, and reverse
+                # it so that each position's index is the level it describes
+                # e.g. a dot_dash_str of "--_..." becomes a path_str of "_--"
+                path_str = dot_dash_str[:node_level][::-1]
+                # path_closed_status[level_index] is a bool representing if
+                # that level is closed (True means closed, False means open)
+                path_closed_status = [p == "-" for p in path_str]
+            if node_level > 0:
+                connectors = []
+                for level_index, is_closed in enumerate(path_closed_status):
+                    assert level_index < node_level, "Should never be node's level"
+                    if level_index == (node_level - 1) and is_closed:
+                        # Closed at leaf level (i.e. "closing")
+                        connector = outline_dict["last_child"]
+                        connector += outline_dict["h_connect"]
+                    elif is_closed:
+                        # Closed "before" leaf level (i.e. "already closed")
+                        connector = outline_dict["empty"] * 2
+                    elif level_index < (node_level - 1) and not is_closed:
+                        # Unclosed at intermediate level (i.e. "continuing")
+                        connector = outline_dict["v_connect"]
+                        connector += outline_dict["empty"]
+                    else:
+                        # Unclosed at node level (i.e. "remaining open")
+                        connector = outline_dict["mid_child"]
+                        connector += outline_dict["h_connect"]
+                    connectors.append(connector)
+                connector_str = "".join(connectors)
+                parsed_line += connector_str
+            parsed_line += line[len(dot_dash_str) + 1 :]
+            outline.append(parsed_line)
+        return "\n".join(outline)
 
 
 class TreePath(list):
@@ -127,7 +230,42 @@ class TreePath(list):
 
     def __repr__(self):
         n_id = len(self)
-        return f"TreePath of {n_id} IDs, deepest level {self.deepest_level}:\n{self}"
+        tp_r = [f"TreePath of {n_id} windows:"]
+        level_repr_indent_size = 2
+        indent = " " * level_repr_indent_size
+        for win in self:
+            if "level" in win.__dict__:
+                level_indent = indent * win.level
+            else:
+                level_indent = ""
+            tp_r.append(f"{level_indent}{win}".split("\n")[0])
+        return "\n".join(tp_r)
+
+    def outline(self):
+        """
+        TODO: Print a simple outline view of the path from its source.
+        Unlike the __repr__, just show the hierarchy of windows and IDs,
+        as in a file viewer.
+        """
+        outline_view = []
+        outline_dict = {
+            "last_child": "┗",
+            "h_connect": "━",
+        }
+        level_repr_indent_size = 2
+        indent = " " * level_repr_indent_size
+        for i, win in enumerate(self):
+            if "level" in win.__dict__:
+                level_indent = (indent * win.level)[2:]
+                level_indent += outline_dict["last_child"] + outline_dict["h_connect"]
+            else:
+                level_indent = ""
+            if win.name is None:
+                name_repr = "(unnamed)"
+            else:
+                name_repr = win.name
+            outline_view.append(f"{level_indent}{win.win_id}: {name_repr}")
+        return "\n".join(outline_view)
 
     @property
     def deepest_level(self):

@@ -17,7 +17,7 @@ class Window(list):
             name_r = f'"{self.name}"'
         level_repr_indent_size = 2
         indent = " " * level_repr_indent_size
-        if 'level' in self.__dict__:
+        if "level" in self.__dict__:
             level_r = f", level: {self.level}"
             level_indent = indent * self.level
         else:
