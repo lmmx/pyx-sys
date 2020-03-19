@@ -51,11 +51,13 @@ def process_xwin_tree(tree_str):
                 # Don't open the new level yet, wait for the window info on next line
                 continue
             tree.open_path.deepen(line)
+            continue
         elif line_level < tree.deepest_open_level:
             # The deepest level is completed, this line is a sibling on a previous level
             tree.retract_to_level(line_level)
             tree.open_path.continue_level(line)
-        if line_level == tree.deepest_open_level:
+            continue
+        elif line_level == tree.deepest_open_level:
             # This line will be declaring a new entry in the deepest indentation level
             if line_level == 0:
                 # This is the parent of the source window

@@ -27,10 +27,7 @@ class WindowTree(object):
         return
 
     def __repr__(self):
-        if self.root.win_id == self.source.win_id:
-            return "WindowTree (unrooted)"
-        else:
-            return "WindowTree (root: {self.root})"
+        return f"WindowTree (rooted at {self.root})"
 
     @property
     def root(self):
