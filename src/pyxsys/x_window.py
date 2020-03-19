@@ -10,18 +10,28 @@ class Window(list):
         """
         An inheritable string representation. Prints the window type and ID.
         """
+        id_r = f", id: {self.win_id}, "
         if self.name is None:
-            name_repr = "(has no name)"
+            name_r = "(has no name)"
         else:
-            name_repr = f'"{self.name}"'
+            name_r = f'"{self.name}"'
+        level_repr_indent_size = 2
+        indent = " " * level_repr_indent_size
+        if 'level' in self.__dict__:
+            level_r = f", level: {self.level}"
+            level_indent = indent * self.level
+        else:
+            level_r = ""
+            level_indent = ""
         n_children = len(self.children)
+        chdn_repr = f"\n{indent}".join([f"{ch}" for ch in self.children])
         if n_children == 1:
-            child_repr = f"\n1 child window: {self.children}"
+            child_r = f"\n{level_indent}  1 child: {chdn_repr}"
         elif n_children > 1:
-            child_repr = f"\n{n_children} child windows: {self.children}"
+            child_r = f"\n{level_indent}  {n_children} children: {chdn_repr}"
         else:
-            child_repr = ""
-        return f"{type(self).__name__}, id: {self.win_id} {name_repr}{child_repr}"
+            child_r = ""
+        return f"{type(self).__name__}{id_r}{name_r}{level_r}{child_r}"
 
     @staticmethod
     def check_id(win_id):
@@ -233,7 +243,8 @@ class SubnodeDesc(Window):
 
 
 class ChildWindow(SubnodeDesc):
-    def __init__(self, line):
+    def __init__(self, line, level):
         self.check_line_entry(line, "0x")
+        self.level = level
         super(ChildWindow, self).__init__(line)
         return

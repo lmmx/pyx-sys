@@ -100,6 +100,16 @@ class WindowTree(object):
     def indent_step_size(self):
         return self._indent_step_size
 
+    def outline(self):
+        """
+        TODO: Print a simple outline view of the tree from its source.
+        Unlike the __repr__, just show the hierarchy of windows and IDs,
+        as in a file viewer.
+        """
+        outline_view = ""
+        #outline_view += self.source.win_id
+        return outline_view
+
 
 class TreePath(list):
     """
@@ -143,7 +153,7 @@ class TreePath(list):
         the path by its ID only), while its parent (i.e. prior node on the TreePath)
         window will have the extension window added as a child node.
         """
-        extension_window = ChildWindow(child_window_line)
+        extension_window = ChildWindow(child_window_line, self.deepest_level + 1)
         # assert Window in type(extension_window).mro(), "TreePath.deepen takes a Window"
         self.deepest_node.add_children([extension_window])
         self.extend([extension_window])
@@ -157,7 +167,7 @@ class TreePath(list):
         this method is used when the level has already been begun (i.e. adding a sibling
         at the level of a previous child rather than a new level of children).
         """
-        extension_window = ChildWindow(sibling_window_line)
+        extension_window = ChildWindow(sibling_window_line, self.deepest_level)
         # assert Window in type(extension_window).mro(), "TreePath.deepen takes a Window"
         assert self.deepest_level > 0, "No parent windows: path has only one window"
         self.deepest_parent.add_children([extension_window])
