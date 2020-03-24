@@ -20,7 +20,11 @@ A library for storage and restore of system state in terms of windows and worksp
 - [x] Access the `xwininfo` tree, stored as a `WindowTree` class with a `children` attribute that can be walked
       to enumerate all windows on the system.
   - [ ] Modify and activate particular windows in the tree using `wmctrl` given their ID
-  - [ ] Cross-reference to the workspace listing (TODO: find where this is stored)
+  - [ ] Cross-reference to the workspace listing
+- [x] Access the `wmctrl` workspace listing, stored as a `WorkspaceTree` class with a `sticky_windows` attribute
+      containing the desktop windows and a `workspaces` attribute, each of which has a `windows` attribute that lists
+      all windows in that workspace
+  - [ ] Connect window IDs to those in the `WindowTree` from `xwininfo` (differ by one hex digit)
 - [x] List Firefox window/tab list which can be cross-referenced to the X window/workspace list
   - [ ] Store the list of windows/tabs
   - [ ] Cross-reference to the X window/workspace list

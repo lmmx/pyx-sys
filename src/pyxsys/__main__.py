@@ -35,4 +35,4 @@ ff_only = arg_l.firefox_only
 x_only = arg_l.x_win_only
 
 # run_cli(restore, kill, ff_only, x_only)
-session = run_cli(session_file=jsonlz4)
+ff_session, x_session, wm_territory = run_cli(ff_session_file=jsonlz4)
