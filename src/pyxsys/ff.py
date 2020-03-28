@@ -78,7 +78,7 @@ def read_recovery_json(jsonlz4_path=None):
     return json
 
 
-def read_session(session_file=None, report=True):
+def read_session(session_file=None):
     """
     Decompress the session storage backup of either the default browser profile,
     or one specified by the session_file parameter (filetype must be JSONLZ4).

@@ -25,7 +25,7 @@ class Workspace(object):
         repr_str += f"on desktop {self.number}: '{self.name}' "
         repr_str += f"({self.geometry}){current_str}"
         return repr_str
-    
+
     @property
     def win_id(self):
         return self._win_id

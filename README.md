@@ -14,6 +14,8 @@ A library for storage and restore of system state in terms of windows and worksp
 - Linux
   - For use with Mac/Windows, I'd need to see their Firefox `sessionstore-backups` location
 - X window system (`xwininfo` must be called to retrieve the list of windows)
+- `wmctrl` (determine workspaces the windows are in through the window manager)
+- `tmux` (to obtain listings of terminal windows, any splits/resultant panes, and activities therein)
 
 ## Capabilities
 
@@ -28,7 +30,8 @@ A library for storage and restore of system state in terms of windows and worksp
 - [x] List Firefox window/tab list which can be cross-referenced to the X window/workspace list
   - [ ] Store the list of windows/tabs
   - [ ] Cross-reference to the X window/workspace list
-- [ ] List and store terminal locations and tmux config, cross-reference to X window/workspace list
+- [x] List tmux terminal session list (e.g. which text files are open in vim, command line paths, etc.)
+  - [ ] cross-reference to X window/workspace list
 
 ## Rationale
 
@@ -39,6 +42,34 @@ A library for storage and restore of system state in terms of windows and worksp
     recorded together.
   - Partly this is for session restore, however it may also be used for 'reference restore', i.e. restore at a later date,
     (for instance when returning to work on a particular feature and opening both the code files and the docs together).
+
+## Current workflow
+
+When the module is run (`python3 -im pyxsys` from the `src/` directory), `__main__.py` calls `cli.py` and finally
+adds four local variables to the Python environment:
+
+- `ff_session` — `BrowserSession` class from `ff_session.py` representing a Firefox browser's state (excluding incognito windows)
+- `x_session` — `WindowTree` class from `x_tree.py` representing the X window manager's listing of windows in the active session
+- `wm_territory` — `WorkspaceTree` class from `wm_territory.py` representing the `wmctrl`-derived window manager set of workspaces 
+  (which I term a 'territory' following the notion of _Zubin spaces_ from the GIS research literature on "spatial information theory")
+- `tmux_server` — `TmuxServer` class from `tmux_server.py` representing the currently running tmux instance, all terminals across
+  all windows/workspaces, and listing relevant information about all panes within them.
+
+They look something like this:
+
+```
+>>> ff_session
+BrowserSession of 11 windows, since 2020-03-05 16:48:39.172000
+>>> x_session
+WindowTree (rooted at RootWindow, id: 0x13f, (has no name))
+>>> wm_territory
+WorkspaceTree of 9 workspaces (30 windows)
+>>> tmux_server
+TmuxServer of 15 sessions (15 windows)
+```
+
+I'm currently working on finishing off the finer details of these classes, and aim to make them 'work together',
+i.e. cross-reference their IDs and related activities.
 
 ## Read more
 
