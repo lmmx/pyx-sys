@@ -1,9 +1,10 @@
-class Window(list):
-    def __init__(self, win_id, name, geom=None):
+class Window(object):
+    def __init__(self, win_id, name, geom=None, d_num=None):
         self.win_id = win_id
         self.name = name
         self.geom = geom
-        self._children = list()
+        self.children = []
+        self.desktop_number = d_num
         return
 
     def __repr__(self):
@@ -31,7 +32,10 @@ class Window(list):
             child_r = f"\n{level_indent}  {n_children} children: {chdn_repr}"
         else:
             child_r = ""
-        return f"{type(self).__name__}{id_r}{name_r}{level_r}{child_r}"
+        d_num_r = ""
+        if self.desktop_number is not None:
+            d_num_r += f", desktop {self.desktop_number}"
+        return f"{type(self).__name__}{id_r}{name_r}{level_r}{child_r}{d_num_r}"
 
     @staticmethod
     def check_id(win_id):
@@ -66,6 +70,11 @@ class Window(list):
     def children(self):
         return self._children
 
+    @children.setter
+    def children(self, vals):
+        self._children = vals
+        return
+
     def add_children(self, subnode_list):
         self.children.extend(subnode_list)
         return
@@ -77,6 +86,15 @@ class Window(list):
     @geom.setter
     def geom(self, geom):
         self._geom = geom
+        return
+
+    @property
+    def desktop_number(self):
+        return self._desktop_number
+
+    @desktop_number.setter
+    def desktop_number(self, d_num):
+        self._desktop_number = d_num
         return
 
 

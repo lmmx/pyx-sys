@@ -1,4 +1,4 @@
-from tmux_session import list_sessions
+from pyxsys.tm.session import list_sessions
 
 
 class TmuxServer(object):

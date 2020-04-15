@@ -1,6 +1,6 @@
 from subprocess import run
 from datetime import datetime as dt
-from tmux_window import list_windows
+from pyxsys.tm.window import list_windows
 
 
 def list_session_formats():

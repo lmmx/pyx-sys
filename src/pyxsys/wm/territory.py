@@ -1,5 +1,5 @@
-from wm_window import StickyWindow, WorkspaceWindow
-from wm_workspace import Workspace
+from pyxsys.wm.window import StickyWindow, WorkspaceWindow
+from pyxsys.wm.workspace import Workspace
 
 
 class WorkspaceTerritory(object):
@@ -52,7 +52,7 @@ class WorkspaceTerritory(object):
         """
         Return a list of sticky windows, followed by workspaces' windows.
         """
-        ws_windows = [w.windows for w in self.workspaces]
+        ws_windows = [x for xs in [w.windows for w in self.workspaces] for x in xs]
         return self.sticky_windows + ws_windows
 
     @property
@@ -91,7 +91,21 @@ class WorkspaceTerritory(object):
         for ws_n in workspace_windows:
             window_list = workspace_windows[ws_n]
             self.get_workspace(ws_n).add_windows(window_list)
-        self.sticky_windows.extend([sticky_windows])
+        self.sticky_windows.extend(sticky_windows)
         for ws_n in workspace_windows:
             target_ws = self.get_workspace(ws_n)
+        return
+
+    def xref_x_session(self, x_session):
+        """
+        Mark all windows with their workspace
+        """
+        for tw in self.windows:
+            tw_id = int(tw.win_id, 16)
+            xw_list = [x for xs in x_session.walk() for x in xs]
+            for xw in xw_list:
+                xw_id = int(xw.win_id, 16)
+                if tw_id == xw_id:
+                    xw.desktop_number = tw.desktop_number
+                    break
         return

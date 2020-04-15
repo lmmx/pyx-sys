@@ -1,6 +1,6 @@
 from subprocess import run
 from shutil import which
-from x_tree import WindowTree
+from pyxsys.xw.tree import WindowTree
 
 
 def read_xwin_tree():

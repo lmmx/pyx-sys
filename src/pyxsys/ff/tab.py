@@ -18,7 +18,8 @@ class Tab(object):
     def __init__(self, json):
         self._history = TabHistoryChain(json["entries"])
         self._last_accessed = dt.fromtimestamp(json["lastAccessed"] / 1000)
-        self._index = json["index"] - 1
+        # TODO: FIX - Commented out as it was giving an error when reading in the file
+        # self._index = json["index"] - 1
         self._icon = json["image"]
         return
 

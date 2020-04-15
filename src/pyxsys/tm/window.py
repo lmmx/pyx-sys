@@ -1,5 +1,5 @@
 from subprocess import run
-from tmux_pane import TmuxPane, PaneSplit
+from pyxsys.tm.pane import TmuxPane, PaneSplit
 
 
 def list_window_formats():
@@ -159,7 +159,7 @@ def parse_pane_geom_tree(panes_str):
         else:
             panes_csv = p.split(",")
         pane_it = range(len(panes_csv) // n_csv)  # iterator to take 4 CSV at a time
-        pane_descs = [panes_csv[n_csv * i : n_csv * (i + 1)] for i in pane_it]
+        pane_descs = map(lambda i: panes_csv[n_csv * i : n_csv * (i + 1)], pane_it)
         if len(split_index_path) > 0:
             current_split_i = split_index_path[-1]
         else:
@@ -182,15 +182,16 @@ def parse_pane_geom_tree(panes_str):
             ps = PaneSplit(pane_split_info, open_index, parent_split_index)
             pane_split_list.append(ps)
     pane_tree = PaneTree(pane_split_list, pane_list)
-    #pane_tree = {"splits": pane_split_list, "panes": pane_list}
+    # pane_tree = {"splits": pane_split_list, "panes": pane_list}
     return pane_tree
+
 
 class PaneTree(object):
     def __init__(self, splits, panes):
         self.splits = splits
         if len(splits) > 0:
             for pane in panes:
-                self.assign_pane(pane, to_split = pane.parent_split_index)
+                self.assign_pane(pane, to_split=pane.parent_split_index)
             self.root_pane = None
         else:
             assert len(panes) == 1, ValueError(f"Expected panes to be just one pane")
@@ -208,7 +209,7 @@ class PaneTree(object):
             pane_str += "s"
         r = f"PaneTree of {pane_str} in {split_str}"
         return r
-    
+
     @property
     def splits(self):
         return self._splits
@@ -217,7 +218,7 @@ class PaneTree(object):
     def splits(self, split_list):
         self._splits = split_list
         return
-    
+
     @property
     def root_pane(self):
         return self._root_pane

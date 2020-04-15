@@ -1,7 +1,7 @@
 from pathlib import Path
 from configparser import ConfigParser
 from lz4 import read_jsonlz4
-from ff_session import BrowserSession
+from pyxsys.ff.session import BrowserSession
 
 
 def find_recovery_json():

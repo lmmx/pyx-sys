@@ -1,4 +1,4 @@
-class Window(list):
+class Window(object):
     def __init__(self, win_id, d_num, client_hostname, win_title):
         self.desktop_number = d_num
         self.win_id = win_id

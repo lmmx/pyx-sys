@@ -1,6 +1,6 @@
 from subprocess import run
 from shutil import which
-from tmux_server import TmuxServer
+from pyxsys.tm.server import TmuxServer
 
 
 def read_tmux_server():

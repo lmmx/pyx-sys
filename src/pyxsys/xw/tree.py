@@ -1,4 +1,5 @@
-from x_window import ChildWindow, RootWindow, SourceWindow
+from pyxsys.xw.window import ChildWindow, RootWindow, SourceWindow
+from colours import colour_str
 
 
 class WindowTree(object):
@@ -140,6 +141,9 @@ class WindowTree(object):
         root_name = root.name
         if root_name is None:
             root_name = "(unnamed)"
+        if root.desktop_number is not None:
+            d_num_coloured = colour_str("green", f" ⠶ workspace {root.desktop_number}")
+            root_name += d_num_coloured
         outline.append(" ".join([indent, root_name]))
         for i, child in enumerate(root.children, 0):
             if i == len(root.children) - 1:
@@ -212,6 +216,17 @@ class WindowTree(object):
             parsed_line += line[len(dot_dash_str) + 1 :]
             outline.append(parsed_line)
         return "\n".join(outline)
+
+    def walk(self, start_node=None):
+        """
+        Recursive walk from the start_node (by default, the source node) by iterating
+        through the 'children' attribute at each step [depth-first not breadth-first].
+        """
+        if start_node is None:
+            start_node = self.source
+        yield start_node.children
+        for c in start_node.children:
+            yield from self.walk(start_node=c)
 
 
 class TreePath(list):

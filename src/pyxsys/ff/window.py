@@ -1,4 +1,4 @@
-from ff_tab import TabSet
+from pyxsys.ff.tab import TabSet
 
 
 class Window(object):

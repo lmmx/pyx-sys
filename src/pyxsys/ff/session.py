@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from ff_window import Window
+from pyxsys.ff.window import Window
 
 
 class BrowserSession(object):

@@ -1,3 +1,63 @@
+def list_pane_formats():
+    pane_formats = [
+        "history_size",
+        "history_bytes",
+        "pane_index",
+        "pane_width",
+        "pane_height",
+        "pane_id",
+        "pane_active",
+        "pane_tty",
+        "pane_pid",
+        "pane_current_path",
+        "pane_current_command",
+        "cursor_x",
+        "cursor_y",
+        "scroll_region_upper",
+        "scroll_region_lower",
+        # "cursor_flag",
+        "keypad_cursor_flag",
+        "keypad_flag",
+        # "wrap_flag",
+    ]
+    return pane_formats
+
+
+def list_panes(active_only=True, numeric_id_sort=True):
+    """
+    Return a list of TmuxWindow instances created by parsing the output of
+    `tmux list-windows`.
+    """
+    pre_str = "#{"
+    post_str = "}"
+    s_formats = [f"{pre_str}{x}{post_str}" for x in list_pane_formats()]
+    format_string = "\t".join(s_formats)
+    tmux_args = ["tmux", "list-panes", "-a", "-F", format_string]
+    result = run(tmux_args, capture_output=True)
+    assert result.returncode == 0, f"`{' '.join(tmux_args)}'` failed.\n{result.stderr}"
+    panes_str = result.stdout.decode()
+    pane_list = []
+    for line in windows_str.split("\n"):
+        if line == "":
+            continue
+        window = parse_window_line(line)
+        if attached_only:
+            if not window.is_attached:
+                continue
+        window_list.append(window)
+    if numeric_id_sort:
+        window_list = sorted(window_list, key=lambda x: int(x.win_id.lstrip("@")))
+    return window_list
+
+
+def parse_window_line(line):
+    """
+    Instantiate a TmuxWindow object from the TSV returned by `tmux list-sessions`.
+    """
+    window = TmuxWindow(*line.split("\t"))
+    return window
+
+
 class PaneGeom(object):
     def __init__(self, width, height, x, y, pane_id):
         self.width = width

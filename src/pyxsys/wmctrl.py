@@ -1,6 +1,6 @@
 from subprocess import run
 from shutil import which
-from wm_territory import WorkspaceTerritory
+from pyxsys.wm.territory import WorkspaceTerritory
 
 
 def read_wmctrl_listings():

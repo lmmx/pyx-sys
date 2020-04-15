@@ -1,7 +1,7 @@
-from pyxsys.ff import read_session as read_ff_session
-from xwininfo import read_xwin_tree
-from wmctrl import read_wmctrl_listings as read_wm
-from tmux import read_tmux_server
+from pyxsys.firefox import read_session as read_ff_session
+from pyxsys.xwininfo import read_xwin_tree
+from pyxsys.wmctrl import read_wmctrl_listings as read_wm
+from pyxsys.tmux import read_tmux_server
 
 
 def main(ff_x_wm_tmux_toggle=tuple([True] * 4), ff_session_file=None, report=True):
@@ -30,6 +30,8 @@ def main(ff_x_wm_tmux_toggle=tuple([True] * 4), ff_session_file=None, report=Tru
         tmux_server = read_tmux_server()
     else:
         tmux_server = None
+    if x_tree is not None and wm_territory is not None:
+        wm_territory.xref_x_session(x_tree)
     if report:
         print("------------------COMPLETE--------------------------")
     return ff_session, x_tree, wm_territory, tmux_server
