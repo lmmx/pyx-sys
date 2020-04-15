@@ -48,11 +48,11 @@ A library for storage and restore of system state in terms of windows and worksp
 When the module is run (`python3 -im pyxsys` from the `src/` directory), `__main__.py` calls `cli.py` and finally
 adds four local variables to the Python environment:
 
-- `ff_session` — `BrowserSession` class from `ff_session.py` representing a Firefox browser's state (excluding incognito windows)
-- `x_session` — `WindowTree` class from `x_tree.py` representing the X window manager's listing of windows in the active session
-- `wm_territory` — `WorkspaceTree` class from `wm_territory.py` representing the `wmctrl`-derived window manager set of workspaces 
+- `ff_session` — `pyxsys.ff.session`⠶`BrowserSession` class representing a Firefox browser's state (excluding incognito windows)
+- `x_session` — `pyxsys.x.tree`⠶`WindowTree` class representing the X window manager's listing of windows in the active session
+- `wm_territory` — `pyxsys.wm.territory`⠶`WorkspaceTree` class representing the `wmctrl`-derived window manager set of workspaces 
   (which I term a 'territory' following the notion of _Zubin spaces_ from the GIS research literature on "spatial information theory")
-- `tmux_server` — `TmuxServer` class from `tmux_server.py` representing the currently running tmux instance, all terminals across
+- `tmux_server` — `pyxsys.tm.server`⠶`TmuxServer` class representing the currently running tmux instance, all terminals across
   all windows/workspaces, and listing relevant information about all panes within them.
 
 They look something like this:
