@@ -25,6 +25,9 @@ class WorkspaceTerritory(object):
 
     This class combines both of these listings as a 'territory' of workspaces,
     and populates the workspaces with windows (stored in them as attributes).
+    
+    TODO: add a lookup function to return the workspace with a given desktop number,
+          for use in pyxsys.recover.remap⠶WorkspaceTerritoryRemap.transform_to_remap
     """
 
     def __init__(self, workspaces_str, windows_str):
@@ -36,7 +39,7 @@ class WorkspaceTerritory(object):
     def __repr__(self):
         n_ws = len(self.workspaces)
         n_w = sum([len(ws.windows) for ws in self.workspaces])
-        return f"WorkspaceTree of {n_ws} workspaces ({n_w} windows)"
+        return f"WorkspaceTerritory of {n_ws} workspaces ({n_w} windows)"
 
     @property
     def workspaces(self):
@@ -107,5 +110,6 @@ class WorkspaceTerritory(object):
                 xw_id = int(xw.win_id, 16)
                 if tw_id == xw_id:
                     xw.desktop_number = tw.desktop_number
+                    tw.x_win_id = xw.win_id
                     break
         return
