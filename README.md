@@ -22,11 +22,12 @@ A library for storage and restore of system state in terms of windows and worksp
 - [x] Access the `xwininfo` tree, stored as a `WindowTree` class with a `children` attribute that can be walked
       to enumerate all windows on the system.
   - [ ] Modify and activate particular windows in the tree using `wmctrl` given their ID
-  - [ ] Cross-reference to the workspace listing
-- [x] Access the `wmctrl` workspace listing, stored as a `WorkspaceTree` class with a `sticky_windows` attribute
+  - [x] Cross-reference to the workspace listing
+- [x] Access the `wmctrl` workspace listing, stored as a `WorkspaceTerritory` class with a `sticky_windows` attribute
       containing the desktop windows and a `workspaces` attribute, each of which has a `windows` attribute that lists
       all windows in that workspace
-  - [ ] Connect window IDs to those in the `WindowTree` from `xwininfo` (differ by one hex digit)
+  - [x] Connect window IDs to those in the `WindowTree` from `xwininfo` (differ by one hex digit)
+  - [x] Restore windows to a workspace from a pickled `WorkspaceTerritory` on disk
 - [x] List Firefox window/tab list which can be cross-referenced to the X window/workspace list
   - [ ] Store the list of windows/tabs
   - [ ] Cross-reference to the X window/workspace list
@@ -50,7 +51,7 @@ adds four local variables to the Python environment:
 
 - `ff_session` — `pyxsys.ff.session`⠶`BrowserSession` class representing a Firefox browser's state (excluding incognito windows)
 - `x_session` — `pyxsys.x.tree`⠶`WindowTree` class representing the X window manager's listing of windows in the active session
-- `wm_territory` — `pyxsys.wm.territory`⠶`WorkspaceTree` class representing the `wmctrl`-derived window manager set of workspaces 
+- `wm_territory` — `pyxsys.wm.territory`⠶`WorkspaceTerritory` class representing the `wmctrl`-derived window manager set of workspaces 
   (which I term a 'territory' following the notion of _Zubin spaces_ from the GIS research literature on "spatial information theory")
 - `tmux_server` — `pyxsys.tm.server`⠶`TmuxServer` class representing the currently running tmux instance, all terminals across
   all windows/workspaces, and listing relevant information about all panes within them.
@@ -63,7 +64,7 @@ BrowserSession of 11 windows, since 2020-03-05 16:48:39.172000
 >>> x_session
 WindowTree (rooted at RootWindow, id: 0x13f, (has no name))
 >>> wm_territory
-WorkspaceTree of 9 workspaces (30 windows)
+WorkspaceTerritory of 9 workspaces (30 windows)
 >>> tmux_server
 TmuxServer of 15 sessions (15 windows)
 ```
@@ -74,3 +75,9 @@ i.e. cross-reference their IDs and related activities.
 ## Read more
 
 - Wiki ⠶ [Firefox profiles](wiki/Firefox_profiles.md)
+
+## Sources
+
+- Initial spark for this project was these 2 Q&A posts:
+  - [Is there a dynamic-multiple-monitor friendly desktop environment available for Ubuntu?](https://askubuntu.com/questions/411503/is-there-a-dynamic-multiple-monitor-friendly-desktop-environment-available-for-u)
+  - [How can I save/restore window positions when I undock/dock my laptop?](https://unix.stackexchange.com/questions/59908/how-can-i-save-restore-window-positions-when-i-undock-dock-my-laptop)
