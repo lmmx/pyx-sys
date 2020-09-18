@@ -85,26 +85,45 @@ e.g.
 
 I may want others, but to replicate the useful output from `ps jf -A` we can use:
 
-- `%P` for PPID
-- `%p` for PID
-- `%r` for PGID
-- `?` for SID
+- `%P` for PPID (`ppid`)
+- `%p` for PID (`pid`)
+- `%r` for PGID (`pgid`)
+- N/A for SID (`sid`)
   - unclear that this would be needed since PGID is available
-- `y` for TTY
-- `?` for TPGID
+- `%y` for TTY (`tname`)
+- N/A for TPGID (`tpgid`)
   - this is "ID of the foreground process group on the tty (terminal) that the process is connected to,
     or -1 if the process is not connected to a tty."
   - it is -1 for all processes except those whose TTY is a PTS (pseudoterminal slave)
   - I suspect this can be found via window manager anyway?
-- `?` for STAT
+- N/A for STAT (`stat`)
   - refers to [`stat`](https://en.wikipedia.org/wiki/Stat_(system_call)) system calls
   - see [this Q&A](https://askubuntu.com/questions/360252/what-do-the-stat-column-values-in-ps-mean)
   - `S` means "interruptible sleep", `s` means "is a session leader", `+` means "is in the foreground process group",
     `l` means "is multi-threaded", `<` means "high priority (not nice to other users)", "N" means nice, `Z` means zombie
     process (terminated but not reaped by its parent process), `L` means "has pages locked into memory"
-- `?` for UID
-- `%x` for TIME
+- N/A for UID (`uid`)
+- `%x` for TIME (`time`)
   - cumulative CPU time (distinct from elapsed time `ETIME`
-- `%a` and `%c` for COMMAND
+- `%a` and `%c` for COMMAND (`args` and `comm`)
   - command with all its arguments as a string (N.B. truncated sometimes) vs. command executable name only
 
+i.e. if those without N/A entries for AIX format specifiers are not needed then AIX format is
+usable, else use the "normal" codes (given in brackets for each top-level bullet point)
+
+To print all of the above then (following the manual's convention here of `-e` rather than `-A` flag):
+
+```sh
+ps_headers=$(echo -e "ppid\tpid\tpgid\tsid\ttname\ttpgid\tstat\tuid\ttime\targs\t")
+ps -eo "$headers"
+```
+⇣
+```STDOUT
+ PPID   PID  PGID   SID TTY      TPGID STAT   UID     TIME COMMAND
+    0     1     1     1 ?           -1 Ss       0 00:00:36 /lib/systemd/systemd --system --deserialize 19
+    0     2     0     0 ?           -1 S        0 00:00:00 [kthreadd]
+...
+```
+
+which matches (exactly!) the output from `ps j -A` (note the process tree is not given in this
+format but I built something similar already for this library)
